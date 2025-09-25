@@ -5,13 +5,16 @@ import { Pool } from "pg";          // Requisição do pacote pg para PostgreSQL
 dotenv.config();                   // Carrega e processa o arquivo .env
 
 const app = express();             // Instancia o Express
-const port = 3000;                 // Define a porta
+const port = process.env.PORT || 3000; // Usa a porta do Vercel ou 3000 localmente
 
 app.use(express.json());           // Middleware para trabalhar com JSON (POST/PUT futuramente)
 
 // Inicializa o Pool de conexão com o banco de dados
 const db = new Pool({  
   connectionString: process.env.URL_BD,  // Conexão com o banco de dados via variáveis de ambiente
+  ssl: {
+    rejectUnauthorized: false, // Necessário em alguns provedores (Supabase, Neon, Render)
+  },
 });
 
 // Rota raiz para teste
@@ -55,6 +58,5 @@ app.get("/questoes", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Serviço rodando na porta: ${port}`);
-});
+// Exportação necessária para o Vercel
+export default app;
